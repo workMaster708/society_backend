@@ -1,13 +1,16 @@
 import express from "express";
 import { MongoClient } from "mongodb";
+import nodemailer from "nodemailer";
 
 // Inlined environment variables
 const MONGODB_URI =
   "mongodb+srv://shahriyahossin708708:topayfoundation@cluster0.rsxbx.mongodb.net/topaysociety?retryWrites=true&w=majority&appName=Cluster0";
+const EMAIL_USER = "societycontact@topayfoundation.com";
+const EMAIL_PASS = "Shahriya7";
 const PORT = 5000;
 
-if (!MONGODB_URI) {
-  throw new Error("MongoDB URI is missing.");
+if (!MONGODB_URI || !EMAIL_USER || !EMAIL_PASS) {
+  throw new Error("One or more environment variables are missing.");
 }
 
 const app = express();
@@ -63,7 +66,7 @@ app.post("/api/projects", async (req, res) => {
   }
 });
 
-// Contact route (without email functionality)
+// Contact route
 app.post("/api/contact", async (req, res) => {
   const { name, email, message } = req.body;
 
@@ -72,12 +75,28 @@ app.post("/api/contact", async (req, res) => {
   }
 
   try {
-    // Simulate handling the contact form submission
-    console.log("Contact form submitted:", { name, email, message });
-    res.status(200).json({ success: true, message: "Contact form submitted successfully" });
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // true for port 465
+      auth: {
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: EMAIL_USER,
+      to: "your-email@example.com", // Replace with your actual email
+      subject: `New Contact Message from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ success: true, message: "Email sent successfully" });
   } catch (error) {
-    console.error("Error processing contact form:", error.message);
-    res.status(500).json({ success: false, error: "Failed to process contact form" });
+    console.error("Error sending email:", error.message);
+    res.status(500).json({ success: false, error: "Failed to send email" });
   }
 });
 
