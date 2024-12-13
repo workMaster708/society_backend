@@ -1,22 +1,25 @@
 import express from "express";
-import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import nodemailer from "nodemailer";
 
-dotenv.config();
+// Inlined environment variables
+const MONGODB_URI =
+  "mongodb+srv://shahriyahossin708708:topayfoundation@cluster0.rsxbx.mongodb.net/topaysociety?retryWrites=true&w=majority&appName=Cluster0";
+const EMAIL_USER = "societycontact@topayfoundation.com";
+const EMAIL_PASS = "Shahriya7";
+const PORT = 5000;
+
+if (!MONGODB_URI || !EMAIL_USER || !EMAIL_PASS) {
+  throw new Error("One or more environment variables are missing.");
+}
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
 // MongoDB connection setup
-const uri = process.env.MONGODB_URI;
-if (!uri) {
-  throw new Error("MONGODB_URI is not defined in the environment variables.");
-}
-const client = new MongoClient(uri);
+const client = new MongoClient(MONGODB_URI);
 let db;
 
 // Connect to MongoDB
@@ -32,7 +35,7 @@ let db;
   }
 })();
 
-// Root route for browser testing
+// Root route for testing
 app.get("/", (req, res) => {
   res.send("<h1>Welcome to the Society Backend</h1><p>Use the API endpoints to interact with the application.</p>");
 });
@@ -77,13 +80,13 @@ app.post("/api/contact", async (req, res) => {
       port: 587,
       secure: false, // true for port 465
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
       },
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: EMAIL_USER,
       to: "your-email@example.com", // Replace with your actual email
       subject: `New Contact Message from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
