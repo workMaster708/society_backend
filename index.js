@@ -32,6 +32,11 @@ let db;
   }
 })();
 
+// Root route for browser testing
+app.get("/", (req, res) => {
+  res.send("<h1>Welcome to the Society Backend</h1><p>Use the API endpoints to interact with the application.</p>");
+});
+
 // Projects route
 app.get("/api/projects", async (req, res) => {
   try {
