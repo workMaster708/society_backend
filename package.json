@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build": "npm install && npm prune --production"
+    "build": "npm install"
   },
   "author": "",
   "license": "ISC",
